@@ -1,0 +1,16 @@
+{
+  // Oxc Formatter configuration.
+  "useTabs": false,
+  "tabWidth": 2,
+  "printWidth": 100,
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "quoteProps": "as-needed",
+  "trailingComma": "all",
+  "semi": false,
+  "arrowParens": "always",
+  "bracketSameLine": false,
+  "bracketSpacing": true,
+  "singleAttributePerLine": false,
+  "ignorePatterns": ["dist", "coverage", "node_modules", "pnpm-lock.yaml", ".vscode"],
+}
