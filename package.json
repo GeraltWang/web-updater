@@ -1,5 +1,5 @@
 {
-  "name": "@web-tools/web-updater",
+  "name": "@ex-web-tools/web-updater",
   "version": "1.0.0",
   "description": "Detect frontend app updates by polling your entry HTML from a browser worker.",
   "license": "MIT",

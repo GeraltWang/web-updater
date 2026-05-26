@@ -1,4 +1,4 @@
-# @web-tools/web-updater
+# @ex-web-tools/web-updater
 
 Detect frontend app updates by polling your entry HTML in a browser worker.
 
@@ -9,18 +9,18 @@ you can switch to `last-modified`.
 ## Install
 
 ```bash
-pnpm add @web-tools/web-updater
+pnpm add @ex-web-tools/web-updater
 ```
 
 ```bash
-npm install @web-tools/web-updater
-yarn add @web-tools/web-updater
+npm install @ex-web-tools/web-updater
+yarn add @ex-web-tools/web-updater
 ```
 
 ## Quick Start
 
 ```ts
-import { createWebUpdater } from '@web-tools/web-updater'
+import { createWebUpdater } from '@ex-web-tools/web-updater'
 
 createWebUpdater({
   htmlFileUrl: '/',
@@ -39,7 +39,7 @@ createWebUpdater({
 ## Vite
 
 ```ts
-import { createWebUpdater } from '@web-tools/web-updater'
+import { createWebUpdater } from '@ex-web-tools/web-updater'
 
 createWebUpdater({
   htmlFileUrl: import.meta.env.BASE_URL,
@@ -53,7 +53,7 @@ createWebUpdater({
 ## Use Last-Modified
 
 ```ts
-import { createWebUpdater } from '@web-tools/web-updater'
+import { createWebUpdater } from '@ex-web-tools/web-updater'
 
 createWebUpdater({
   htmlFileUrl: '/',
@@ -71,7 +71,7 @@ createWebUpdater({
 Creates and starts a `WebUpdater` instance.
 
 ```ts
-import { createWebUpdater } from '@web-tools/web-updater'
+import { createWebUpdater } from '@ex-web-tools/web-updater'
 
 const updater = createWebUpdater({
   htmlFileUrl: '/',
@@ -84,7 +84,7 @@ Creates and starts a `WebUpdater` instance with the same behavior as
 `createWebUpdater`.
 
 ```ts
-import { WebUpdater } from '@web-tools/web-updater'
+import { WebUpdater } from '@ex-web-tools/web-updater'
 
 const updater = new WebUpdater({
   htmlFileUrl: '/',
