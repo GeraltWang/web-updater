@@ -105,6 +105,21 @@ Stops polling and terminates the internal worker.
 
 Stores the latest detected value and reloads the current page.
 
+If the browser, CDN, or service worker can still serve the old entry HTML after a
+plain reload, enable cache busting:
+
+```ts
+updater.refresh({ cacheBust: true })
+```
+
+This navigates to the current URL with a `__web_updater__` query value based on
+the detected version, preserving existing query parameters and hash. You can
+customize the query key:
+
+```ts
+updater.refresh({ cacheBust: true, cacheBustKey: 'v' })
+```
+
 ### `updater.ignoreCurrentVersion()`
 
 Stores the latest detected value without reloading the current page. Use this when
@@ -135,5 +150,9 @@ Clears the stored value from `localStorage`.
 - If `etag` is unavailable, use `headerName: 'last-modified'`.
 - Avoid strong caching for the entry HTML, otherwise the check may not see new
   deployments.
+- If a plain reload sometimes opens the old version, use
+  `updater.refresh({ cacheBust: true })` and configure your server or CDN to
+  avoid caching the entry HTML, for example with `Cache-Control: no-cache` or
+  `Cache-Control: no-store`.
 - The worker is created from an inline Blob, so no extra worker file or static asset
   configuration is required.

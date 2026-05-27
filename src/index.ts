@@ -17,6 +17,14 @@ export interface UpdatePayload {
   etag: string | null
 }
 
+export interface RefreshOptions {
+  /** Navigate with a version query param instead of calling `location.reload()`. */
+  cacheBust?: boolean
+
+  /** Query param name used when `cacheBust` is enabled. */
+  cacheBustKey?: string
+}
+
 export interface WebUpdaterOptions {
   /** Entry HTML URL to check, usually `/` or `import.meta.env.BASE_URL`. */
   htmlFileUrl: string
@@ -85,6 +93,14 @@ function readStoredEtag(key: string): string | null {
 
 function isUpdateMessage(message: WorkerResponseMessage): message is WorkerUpdateMessage {
   return 'etag' in message
+}
+
+function createCacheBustedUrl(url: string, key: string, value: string): string {
+  const cacheBustedUrl = new URL(url)
+
+  cacheBustedUrl.searchParams.set(key, value)
+
+  return cacheBustedUrl.toString()
 }
 
 /** Browser updater that polls entry HTML headers to detect frontend deployments. */
@@ -175,8 +191,20 @@ export class WebUpdater {
   }
 
   /** Stores the latest detected header value and reloads the current page. */
-  refresh(): void {
+  refresh(options: RefreshOptions = {}): void {
     window.localStorage.setItem(this.options.appEtagKey, String(this.appEtag))
+
+    if (options.cacheBust) {
+      window.location.replace(
+        createCacheBustedUrl(
+          window.location.href,
+          options.cacheBustKey ?? '__web_updater__',
+          this.appEtag ?? String(Date.now()),
+        ),
+      )
+      return
+    }
+
     window.location.reload()
   }
 

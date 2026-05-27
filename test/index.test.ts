@@ -50,7 +50,9 @@ describe('WebUpdater', () => {
         removeItem: vi.fn((key: string) => storage.delete(key)),
       },
       location: {
+        href: 'https://example.com/app?tab=home#settings',
         reload,
+        replace: vi.fn(),
       },
     })
     vi.stubGlobal('document', {
@@ -173,6 +175,54 @@ describe('WebUpdater', () => {
 
     expect(window.localStorage.setItem).toHaveBeenLastCalledWith('__APP_ETAG__', 'v2')
     expect(window.location.reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('can refresh with a cache-busting URL', async () => {
+    const { createWebUpdater } = await import('../src/index')
+
+    const updater = createWebUpdater({
+      htmlFileUrl: '/',
+    })
+
+    await flushPromises()
+
+    worker.onmessage?.({
+      data: {
+        appEtagKey: '__APP_ETAG__',
+        lastEtag: 'v1',
+        etag: 'v2',
+      },
+    } as MessageEvent)
+    updater.refresh({ cacheBust: true })
+
+    expect(window.localStorage.setItem).toHaveBeenLastCalledWith('__APP_ETAG__', 'v2')
+    expect(window.location.replace).toHaveBeenCalledWith(
+      'https://example.com/app?tab=home&__web_updater__=v2#settings',
+    )
+    expect(window.location.reload).not.toHaveBeenCalled()
+  })
+
+  it('supports a custom cache-busting query key', async () => {
+    const { createWebUpdater } = await import('../src/index')
+
+    const updater = createWebUpdater({
+      htmlFileUrl: '/',
+    })
+
+    await flushPromises()
+
+    worker.onmessage?.({
+      data: {
+        appEtagKey: '__APP_ETAG__',
+        lastEtag: 'v1',
+        etag: 'v2',
+      },
+    } as MessageEvent)
+    updater.refresh({ cacheBust: true, cacheBustKey: 'v' })
+
+    expect(window.location.replace).toHaveBeenCalledWith(
+      'https://example.com/app?tab=home&v=v2#settings',
+    )
   })
 
   it('ignores the latest detected value without reloading', async () => {
