@@ -1,8 +1,16 @@
 {
   "name": "@ex-web-tools/web-updater",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Detect frontend app updates by polling your entry HTML from a browser worker.",
+  "homepage": "https://github.com/GeraltWang/web-updater#readme",
+  "bugs": {
+    "url": "https://github.com/GeraltWang/web-updater/issues"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GeraltWang/web-updater.git"
+  },
   "files": [
     "dist",
     "LICENSE",
