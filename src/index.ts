@@ -7,30 +7,65 @@ import {
 } from './worker'
 
 export interface UpdatePayload {
+  /** The localStorage key used to store the last accepted header value. */
   appEtagKey: string
+
+  /** The header value stored before the worker detected an update. */
   lastEtag: string | null
+
+  /** The latest header value returned by the entry HTML request. */
   etag: string | null
 }
 
 export interface WebUpdaterOptions {
+  /** Entry HTML URL to check, usually `/` or `import.meta.env.BASE_URL`. */
   htmlFileUrl: string
+
+  /** localStorage key used to store the latest known header value. */
   appEtagKey?: string
+
+  /** Polling interval in milliseconds. */
   interval?: number
+
+  /** Whether to check immediately after polling starts. */
   immediate?: boolean
+
+  /** Disable update checks when set to `true`. */
   silent?: boolean
+
+  /** Response header used for version comparison, such as `etag` or `last-modified`. */
   headerName?: 'etag' | 'last-modified' | string
+
+  /** Called when a different header value is detected. */
   onUpdate?: (updater: WebUpdater, payload: UpdatePayload) => void
+
+  /** Called when the initial request or worker request fails. */
   onError?: (error: unknown) => void
 }
 
 interface ResolvedWebUpdaterOptions {
+  /** Entry HTML URL to check, usually `/` or `import.meta.env.BASE_URL`. */
   htmlFileUrl: string
+
+  /** localStorage key used to store the latest known header value. */
   appEtagKey: string
+
+  /** Polling interval in milliseconds. */
   interval: number
+
+  /** Whether to check immediately after polling starts. */
   immediate: boolean
+
+  /** Disable update checks when set to `true`. */
   silent: boolean
+
+  /** Response header used for version comparison, such as `etag` or `last-modified`. */
   headerName: string
+
+  /** Called when a different header value is detected. */
   onUpdate?: (updater: WebUpdater, payload: UpdatePayload) => void
+
+  /** Called when the initial request or worker request fails. */
   onError?: (error: unknown) => void
 }
 
@@ -52,7 +87,9 @@ function isUpdateMessage(message: WorkerResponseMessage): message is WorkerUpdat
   return 'etag' in message
 }
 
+/** Browser updater that polls entry HTML headers to detect frontend deployments. */
 export class WebUpdater {
+  /** The fully resolved updater options, including default values. */
   readonly options: ResolvedWebUpdaterOptions
 
   private appEtag: string | null = null
@@ -75,6 +112,7 @@ export class WebUpdater {
     })
   }
 
+  /** Creates and starts a WebUpdater instance. */
   constructor(options: WebUpdaterOptions) {
     this.options = {
       ...defaultOptions,
@@ -88,6 +126,7 @@ export class WebUpdater {
     this.init()
   }
 
+  /** Starts polling the entry HTML for update headers. */
   start(): void {
     if (this.options.silent || this.worker) {
       return
@@ -124,6 +163,7 @@ export class WebUpdater {
     document.addEventListener('visibilitychange', this.handleVisibilityChange)
   }
 
+  /** Stops polling and terminates the internal worker. */
   stop(): void {
     if (!this.worker) {
       return
@@ -134,12 +174,19 @@ export class WebUpdater {
     document.removeEventListener('visibilitychange', this.handleVisibilityChange)
   }
 
+  /** Stores the latest detected header value and reloads the current page. */
   refresh(): void {
     window.localStorage.setItem(this.options.appEtagKey, String(this.appEtag))
     window.location.reload()
   }
 
-  cancel(): void {
+  /** Stores the latest detected header value without reloading the current page. */
+  ignoreCurrentVersion(): void {
+    window.localStorage.setItem(this.options.appEtagKey, String(this.appEtag))
+  }
+
+  /** Clears the stored header value from localStorage. */
+  clearStoredVersion(): void {
     window.localStorage.removeItem(this.options.appEtagKey)
   }
 
@@ -160,6 +207,7 @@ export class WebUpdater {
   }
 }
 
+/** Creates and starts a WebUpdater instance. */
 export function createWebUpdater(options: WebUpdaterOptions): WebUpdater {
   return new WebUpdater(options)
 }

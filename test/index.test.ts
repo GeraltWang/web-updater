@@ -175,7 +175,7 @@ describe('WebUpdater', () => {
     expect(window.location.reload).toHaveBeenCalledTimes(1)
   })
 
-  it('clears storage when cancelled', async () => {
+  it('ignores the latest detected value without reloading', async () => {
     const { createWebUpdater } = await import('../src/index')
 
     const updater = createWebUpdater({
@@ -183,7 +183,40 @@ describe('WebUpdater', () => {
     })
 
     await flushPromises()
-    updater.cancel()
+
+    worker.onmessage?.({
+      data: {
+        appEtagKey: '__APP_ETAG__',
+        lastEtag: 'v1',
+        etag: 'v2',
+      },
+    } as MessageEvent)
+    updater.ignoreCurrentVersion()
+
+    expect(window.localStorage.setItem).toHaveBeenLastCalledWith('__APP_ETAG__', 'v2')
+    expect(window.location.reload).not.toHaveBeenCalled()
+
+    updater.start()
+
+    expect(worker.postMessage).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        code: 'start',
+        data: expect.objectContaining({
+          lastEtag: 'v2',
+        }),
+      }),
+    )
+  })
+
+  it('clears the stored version', async () => {
+    const { createWebUpdater } = await import('../src/index')
+
+    const updater = createWebUpdater({
+      htmlFileUrl: '/',
+    })
+
+    await flushPromises()
+    updater.clearStoredVersion()
 
     expect(window.localStorage.removeItem).toHaveBeenCalledWith('__APP_ETAG__')
   })

@@ -30,7 +30,8 @@ createWebUpdater({
     if (shouldRefresh) {
       updater.refresh()
     } else {
-      updater.cancel()
+      updater.ignoreCurrentVersion()
+      updater.start()
     }
   },
 })
@@ -104,7 +105,13 @@ Stops polling and terminates the internal worker.
 
 Stores the latest detected value and reloads the current page.
 
-### `updater.cancel()`
+### `updater.ignoreCurrentVersion()`
+
+Stores the latest detected value without reloading the current page. Use this when
+the user dismisses an update prompt and should not be prompted again for the same
+version.
+
+### `updater.clearStoredVersion()`
 
 Clears the stored value from `localStorage`.
 
