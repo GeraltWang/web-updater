@@ -132,16 +132,17 @@ Clears the stored value from `localStorage`.
 
 ## Options
 
-| Option        | Type                                  | Default        | Description                                                         |
-| ------------- | ------------------------------------- | -------------- | ------------------------------------------------------------------- |
-| `htmlFileUrl` | `string`                              | Required       | Entry HTML URL to check, usually `/` or `import.meta.env.BASE_URL`. |
-| `appEtagKey`  | `string`                              | `__APP_ETAG__` | `localStorage` key used to store the latest known value.            |
-| `interval`    | `number`                              | `120000`       | Polling interval in milliseconds.                                   |
-| `immediate`   | `boolean`                             | `true`         | Whether to check immediately after polling starts.                  |
-| `silent`      | `boolean`                             | `false`        | Disable update checks when set to `true`.                           |
-| `headerName`  | `'etag' \| 'last-modified' \| string` | `etag`         | Response header used for version comparison.                        |
-| `onUpdate`    | `(updater, payload) => void`          | `undefined`    | Called when a different header value is detected.                   |
-| `onError`     | `(error) => void`                     | `undefined`    | Called when the initial request or worker request fails.            |
+| Option                    | Type                                  | Default        | Description                                                               |
+| ------------------------- | ------------------------------------- | -------------- | ------------------------------------------------------------------------- |
+| `htmlFileUrl`             | `string`                              | Required       | Entry HTML URL to check. Use a full URL or a path such as `/` or `/app/`. |
+| `appEtagKey`              | `string`                              | `__APP_ETAG__` | `localStorage` key used to store the latest known value.                  |
+| `interval`                | `number`                              | `120000`       | Polling interval in milliseconds.                                         |
+| `immediate`               | `boolean`                             | `true`         | Whether to check immediately after polling starts.                        |
+| `checkOnVisibilityChange` | `boolean`                             | `true`         | Whether to check immediately when the page becomes visible again.         |
+| `silent`                  | `boolean`                             | `false`        | Disable update checks when set to `true`.                                 |
+| `headerName`              | `'etag' \| 'last-modified' \| string` | `etag`         | Response header used for version comparison.                              |
+| `onUpdate`                | `(updater, payload) => void`          | `undefined`    | Called when a different header value is detected.                         |
+| `onError`                 | `(error) => void`                     | `undefined`    | Called when the initial request or worker request fails.                  |
 
 ## Notes
 

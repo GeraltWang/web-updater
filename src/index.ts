@@ -38,6 +38,9 @@ export interface WebUpdaterOptions {
   /** Whether to check immediately after polling starts. */
   immediate?: boolean
 
+  /** Whether to check immediately when the page becomes visible again. */
+  checkOnVisibilityChange?: boolean
+
   /** Disable update checks when set to `true`. */
   silent?: boolean
 
@@ -64,6 +67,9 @@ interface ResolvedWebUpdaterOptions {
   /** Whether to check immediately after polling starts. */
   immediate: boolean
 
+  /** Whether to check immediately when the page becomes visible again. */
+  checkOnVisibilityChange: boolean
+
   /** Disable update checks when set to `true`. */
   silent: boolean
 
@@ -81,6 +87,7 @@ const defaultOptions = {
   appEtagKey: '__APP_ETAG__',
   interval: 1000 * 60 * 2,
   immediate: true,
+  checkOnVisibilityChange: true,
   silent: false,
   headerName: 'etag',
 } satisfies Omit<ResolvedWebUpdaterOptions, 'htmlFileUrl' | 'onUpdate' | 'onError'>
@@ -111,17 +118,19 @@ export class WebUpdater {
   private appEtag: string | null = null
   private worker: Worker | null = null
   private readonly handleVisibilityChange = () => {
+    const isHidden = document.visibilityState === 'hidden'
+
     if (!this.worker) {
       return
     }
 
     this.worker.postMessage({
-      code: document.visibilityState === 'hidden' ? 'pause' : 'resume',
+      code: isHidden ? 'pause' : 'resume',
       data: {
         appEtagKey: this.options.appEtagKey,
         htmlFileUrl: this.options.htmlFileUrl,
         interval: this.options.interval,
-        immediate: this.options.immediate,
+        immediate: isHidden ? this.options.immediate : this.options.checkOnVisibilityChange,
         headerName: this.options.headerName,
         lastEtag: readStoredEtag(this.options.appEtagKey),
       },
@@ -136,7 +145,9 @@ export class WebUpdater {
     }
 
     if (!this.options.htmlFileUrl) {
-      throw new Error('htmlFileUrl is required.')
+      throw new Error(
+        'htmlFileUrl is required. Pass the entry HTML URL to check, such as "/", "/app/", "https://example.com/app/", or import.meta.env.BASE_URL.',
+      )
     }
 
     this.init()

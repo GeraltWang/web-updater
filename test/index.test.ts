@@ -68,6 +68,18 @@ describe('WebUpdater', () => {
     )
   })
 
+  it('throws a helpful error when htmlFileUrl is missing', async () => {
+    const { createWebUpdater } = await import('../src/index')
+
+    expect(() =>
+      createWebUpdater({
+        htmlFileUrl: '',
+      }),
+    ).toThrow(
+      'htmlFileUrl is required. Pass the entry HTML URL to check, such as "/", "/app/", "https://example.com/app/", or import.meta.env.BASE_URL.',
+    )
+  })
+
   it('uses etag by default and starts the worker', async () => {
     const { createWebUpdater } = await import('../src/index')
 
@@ -119,6 +131,62 @@ describe('WebUpdater', () => {
       expect.objectContaining({
         data: expect.objectContaining({
           headerName: 'last-modified',
+        }),
+      }),
+    )
+  })
+
+  it('checks immediately when the page becomes visible by default', async () => {
+    const { createWebUpdater } = await import('../src/index')
+
+    createWebUpdater({
+      htmlFileUrl: '/',
+    })
+
+    await flushPromises()
+
+    const [, handleVisibilityChange] = vi.mocked(document.addEventListener).mock.calls[0] as [
+      string,
+      EventListener,
+    ]
+
+    handleVisibilityChange(new Event('visibilitychange'))
+
+    expect(worker.postMessage).toHaveBeenLastCalledWith({
+      code: 'resume',
+      data: {
+        appEtagKey: '__APP_ETAG__',
+        htmlFileUrl: '/',
+        interval: 120000,
+        immediate: true,
+        headerName: 'etag',
+        lastEtag: 'v1',
+      },
+    })
+  })
+
+  it('can skip the immediate check when the page becomes visible', async () => {
+    const { createWebUpdater } = await import('../src/index')
+
+    createWebUpdater({
+      htmlFileUrl: '/',
+      checkOnVisibilityChange: false,
+    })
+
+    await flushPromises()
+
+    const [, handleVisibilityChange] = vi.mocked(document.addEventListener).mock.calls[0] as [
+      string,
+      EventListener,
+    ]
+
+    handleVisibilityChange(new Event('visibilitychange'))
+
+    expect(worker.postMessage).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        code: 'resume',
+        data: expect.objectContaining({
+          immediate: false,
         }),
       }),
     )
