@@ -99,7 +99,7 @@ describe('WebUpdater', () => {
       code: 'start',
       data: {
         appEtagKey: '__APP_ETAG__',
-        htmlFileUrl: '/',
+        htmlFileUrl: 'https://example.com/',
         interval: 120000,
         immediate: true,
         headerName: 'etag',
@@ -156,7 +156,7 @@ describe('WebUpdater', () => {
       code: 'resume',
       data: {
         appEtagKey: '__APP_ETAG__',
-        htmlFileUrl: '/',
+        htmlFileUrl: 'https://example.com/',
         interval: 120000,
         immediate: true,
         headerName: 'etag',

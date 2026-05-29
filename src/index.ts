@@ -110,6 +110,10 @@ function createCacheBustedUrl(url: string, key: string, value: string): string {
   return cacheBustedUrl.toString()
 }
 
+function createWorkerFetchUrl(url: string): string {
+  return new URL(url, window.location.href).toString()
+}
+
 /** Browser updater that polls entry HTML headers to detect frontend deployments. */
 export class WebUpdater {
   /** The fully resolved updater options, including default values. */
@@ -128,7 +132,7 @@ export class WebUpdater {
       code: isHidden ? 'pause' : 'resume',
       data: {
         appEtagKey: this.options.appEtagKey,
-        htmlFileUrl: this.options.htmlFileUrl,
+        htmlFileUrl: createWorkerFetchUrl(this.options.htmlFileUrl),
         interval: this.options.interval,
         immediate: isHidden ? this.options.immediate : this.options.checkOnVisibilityChange,
         headerName: this.options.headerName,
@@ -179,7 +183,7 @@ export class WebUpdater {
       code: 'start',
       data: {
         appEtagKey: this.options.appEtagKey,
-        htmlFileUrl: this.options.htmlFileUrl,
+        htmlFileUrl: createWorkerFetchUrl(this.options.htmlFileUrl),
         interval: this.options.interval,
         immediate: this.options.immediate,
         headerName: this.options.headerName,
